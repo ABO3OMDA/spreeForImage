@@ -1,20 +1,29 @@
-version: '3.7'
+version: "3.8"
+
 services:
-  postgres:
-    image: postgres:latest
+  spree:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - redis
     environment:
-      POSTGRES_HOST_AUTH_METHOD: trust
+      DATABASE_URL: "postgres://spree_user:spree_pass@db/spree_db"
+      REDIS_URL: "redis://redis:6379/1"
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: spree_user
+      POSTGRES_PASSWORD: spree_pass
+      POSTGRES_DB: spree_db
     volumes:
-      - 'postgres:/var/lib/postgresql/data'
-    ports:
-      - "5432:5432"
+      - pg_data:/var/lib/postgresql/data
+
   redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    volumes:
-      - 'redis:/data'
+    image: redis:7.2
 
 volumes:
-  redis:
-  postgres:
+  pg_data:
+
